@@ -1,0 +1,9 @@
+images/*.png
+__pycache__/*
+.DS_Store
+._.DS_Store
+plausibilitaet/*
+gifs/._floyd-warshall-algorithm2.gif
+gifs/._floyd-warshall-algorithm3.gif
+gifs/floyd-warshall-algorithm2.gif
+gifs/floyd-warshall-algorithm3.gif
