@@ -7,8 +7,8 @@ from PIL import Image
 
 
 
-GRID_LENGTH = 30
-EXTENT_THRESHOLD = 30
+GRID_LENGTH = 20
+EXTENT_THRESHOLD = 20
 
 start_time = time.time()
 np.random.seed(123)
@@ -16,15 +16,16 @@ np.random.seed(123)
 # Create grids.
 source_grid = np.full([GRID_LENGTH+2,GRID_LENGTH+2], np.inf)
 source_grid[1,1:1+GRID_LENGTH] = [1]*GRID_LENGTH
+source_grid[20,1:1+GRID_LENGTH] = [1]*GRID_LENGTH
 # source_grid[1:1+GRID_LENGTH,1:1+GRID_LENGTH] = np.random.randint(low=0, high=2, size=(GRID_LENGTH,GRID_LENGTH))
 # source_grid[1:1+GRID_LENGTH,1:1+GRID_LENGTH] = np.array([[1,1,1,1,1,1,1,1,1,1],[0,1,0,0,0,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]])
 
-# cost_grid = np.full([GRID_LENGTH+2,GRID_LENGTH+2], np.inf)
-# cost_grid[1:1+GRID_LENGTH,1:1+GRID_LENGTH] = np.random.randint(low=1, high=8, size=(GRID_LENGTH,GRID_LENGTH))
-# cost_grid[7:14,7:14] = np.full([7,7], 7)
-img = Image.open('N04E006_FABDEM_V1-0.tif')
-cost_grid = np.array(img)
-cost_grid[100:100+GRID_LENGTH, 100:100+GRID_LENGTH]
+cost_grid = np.full([GRID_LENGTH+2,GRID_LENGTH+2], np.inf)
+cost_grid[1:1+GRID_LENGTH,1:1+GRID_LENGTH] = np.random.randint(low=1, high=8, size=(GRID_LENGTH,GRID_LENGTH))
+cost_grid[7:14,7:14] = np.full([7,7], 7)
+# img = Image.open('N04E006_FABDEM_V1-0.tif')
+# cost_grid = np.array(img)
+# cost_grid[100:100+GRID_LENGTH, 100:100+GRID_LENGTH]
 
 costdist_grid = np.full([GRID_LENGTH+2,GRID_LENGTH+2], np.inf)
 costdist_grid[source_grid==1] = 0
@@ -46,17 +47,17 @@ def body(cost_grid, costdist_grid, row_i, col_i):
         pass
     
     costdist_surrounding = []
-    if current_costdist == np.inf:
-        for row_offset in [-1,0,+1]:
-            for col_offset in [-1,0,+1]:
-                costdist = costdist_grid[row_i+row_offset, col_i+col_offset]
-                costdist_surrounding.append(costdist)
-                cost = cost_grid[row_i+row_offset, col_i+col_offset]
-                if costdist != np.inf:
-                    if row_offset != 0 and col_offset != 0:
-                        l.append(min(costdist_surrounding)+ calc_neighbor_diagonal(current_cost, cost))
-                    else:
-                        l.append(min(costdist_surrounding) + calc_neighbor(current_cost, cost))
+    # if current_costdist == np.inf:
+    for row_offset in [-1,0,+1]:
+        for col_offset in [-1,0,+1]:
+            costdist = costdist_grid[row_i+row_offset, col_i+col_offset]
+            costdist_surrounding.append(costdist)
+            cost = cost_grid[row_i+row_offset, col_i+col_offset]
+            if costdist != np.inf:
+                if row_offset != 0 and col_offset != 0:
+                    l.append(min(costdist_surrounding)+ calc_neighbor_diagonal(current_cost, cost))
+                else:
+                    l.append(min(costdist_surrounding) + calc_neighbor(current_cost, cost))
         
     l.append(current_costdist)
     new_costdist[row_i, col_i] = np.round(np.nanmin(l),1)
@@ -97,7 +98,8 @@ def plot_progress(source_grid, cost_grid, costdist_grid, title="test.png"):
     plt.savefig(f"images/{title}.png", dpi=300, bbox_inches="tight")
     
 # Calculate the algorithm
-for i in range(GRID_LENGTH):
+for i in range(GRID_LENGTH*GRID_LENGTH):
+    print(i)
     new_values = [costdist_grid]
 
     # calc cost dist for each pixel
